@@ -1,0 +1,32 @@
+
+###
+#register a new user
+POST http://localhost:3001/api/users
+content-type: application/json
+
+{
+  "username": "Maaari401",
+  "password": "alepwd",
+  "firstname": "ale",
+  "lastname": "mari",
+  "email" : "ale@mari.com",
+  "birth_date": "2002-06-11"
+}
+
+
+
+###
+
+POST http://localhost:3001/api/sessions
+content-type: application/json
+
+{
+  "username": "Maaari401",
+  "password": "alepwd"
+}
+
+
+###
+
+GET http://localhost:3001/api/sessions/current
+content-type: application/json
