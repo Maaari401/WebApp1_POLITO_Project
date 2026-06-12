@@ -6,10 +6,20 @@ import { check, validationResult } from "express-validator";
 import passport from 'passport';
 import LocalStrategy from 'passport-local';
 import session from 'express-session';
-
+import dayjs from "dayjs";
 import cors from "cors";
 
-import {createUser, getUser} from "./dao.js";
+import {
+    addResult,
+    createUser,
+    getEventById,
+    getEvents,
+    getLeaderboard,
+    getPlayerResults, getRoutes,
+    getStationById,
+    getStations,
+    getUser
+} from "./dao.js";
 
 // init
 const app = express();
@@ -74,8 +84,8 @@ app.get("/api/sessions/current", (req, res) => {
     res.status(401).json({error: "Not authenticated"});
 });
 
-// DELETE /api/session/current
-app.delete("/api/sessions/current", (req, res) => {
+// DELETE /api/sessions/current
+app.delete("/api/sessions/current", isLoggedIn,(req, res) => {
   req.logout(() => {
     res.end();
   });
@@ -103,6 +113,159 @@ app.post("/api/users", [
             req.body.email
         );
         return res.status(201).json(user);
+    } catch (err) {
+        return res.status(503).json({ error: err.message });
+    }
+});
+
+//GET /api/station/<id>
+app.get("/api/station/:id", isLoggedIn, [check("id").isInt().withMessage("The id must be an int")], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+        return res.status(422).json({ errors: errors.array() });
+    try {
+        const station = await getStationById(req.params.id)
+        return res.status(200).json(station);
+    } catch (err) {
+        return res.status(503).json({ error: err.message });
+    }
+});
+
+//GET /api/stations
+app.get("/api/stations", isLoggedIn, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+        return res.status(422).json({ errors: errors.array() });
+    try {
+        const stations = await getStations()
+        return res.status(200).json(stations);
+    } catch (err) {
+        return res.status(503).json({ error: err.message });
+    }
+});
+
+
+
+
+//GET /api/event/<id>
+app.get("/api/event/:id", isLoggedIn, [check("id").isInt().withMessage("The id must be an int")], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+        return res.status(422).json({ errors: errors.array() });
+    try {
+        const event = await getEventById(req.params.id)
+        return res.status(200).json(event);
+    } catch (err) {
+        return res.status(503).json({ error: err.message });
+    }
+});
+/*
+//GET /api/random_event
+app.get("/api/random_event", isLoggedIn, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+        return res.status(422).json({ errors: errors.array() });
+    try {
+        const events = await getRandomEvent()
+        return res.status(200).json(events[Math.floor(Math.random() * events.length)]);
+    } catch (err) {
+        return res.status(503).json({ error: err.message });
+    }
+});
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+//GET /api/game_result_player
+app.get("/api/game_result_player", isLoggedIn, async (req, res) => {
+    const errors = validationResult(req);
+    
+    if (!errors.isEmpty())
+        return res.status(422).json({ errors: errors.array() });
+    
+    if (parseInt(req.params.id) !== req.user.id)
+        return res.status(403).json({ error: "can't ask for game results of another player" });
+    
+    try {
+        const Results = await getPlayerResults(req.params.id)
+        return res.status(200).json(Results);
+    } catch (err) {
+        return res.status(503).json({ error: err.message });
+    }
+});
+
+//GET /api/leaderBoard
+app.get("/api/leaderBoard", isLoggedIn, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+        return res.status(422).json({ errors: errors.array() });
+    try {
+        const board = await getLeaderboard()
+        return res.status(200).json(board);
+    } catch (err) {
+        return res.status(503).json({ error: err.message });
+    }
+});
+/*
+// POST /api/game_result
+app.post("/api/game_result", isLoggedIn, [
+    check("coin").isNumeric().withMessage("Coin must be a number"),
+    check("id_station_start").isNumeric().withMessage("Start station is required"),
+    check("id_station_end").isNumeric().withMessage("End station is required"),
+], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+        return res.status(422).json({ errors: errors.array() });
+    
+    try {
+        const stationStart = await getStationById(req.body.id_station_start);
+        if (!stationStart)
+            return res.status(404).json({ error: "Start station not found" });
+    } catch (err) {
+        return res.status(503).json({ error: err.message });
+    }
+    
+    try {
+        const stationEnd = await getStationById(req.body.id_station_end);
+        if (!stationEnd)
+            return res.status(404).json({ error: "End station not found" });
+    } catch (err) {
+        return res.status(503).json({ error: err.message });
+    }
+    
+    try {
+        const result = await addResult(
+            dayjs().format("YYYY-MM-DD HH:mm:ss"),
+            req.user.id, //player id is taken from the user session due to security issue by allowing fake user values.
+            req.body.coin,
+            req.body.id_station_start,
+            req.body.id_station_end
+        );
+        return res.status(201).json(result);
+    } catch (err) {
+        return res.status(503).json({ error: err.message });
+    }
+});
+*/
+
+//GET /api/routes
+app.get("/api/routes", isLoggedIn, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+        return res.status(422).json({ errors: errors.array() });
+    try {
+        const routes = await getRoutes()
+        return res.status(200).json(routes);
     } catch (err) {
         return res.status(503).json({ error: err.message });
     }

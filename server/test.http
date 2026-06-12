@@ -15,7 +15,7 @@ content-type: application/json
 
 
 
-###
+### LOGIN
 
 POST http://localhost:3001/api/sessions
 content-type: application/json
@@ -29,4 +29,44 @@ content-type: application/json
 ###
 
 GET http://localhost:3001/api/sessions/current
+
+###
+
+DELETE http://localhost:3001/api/sessions/current
+
+
+
+
+###
+GET http://localhost:3001/api/station/1
+
+###
+GET http://localhost:3001/api/stations
+
+
+###
+GET http://localhost:3001/api/event/1
+
+###
+GET http://localhost:3001/api/events
+
+
+###
+GET http://localhost:3001/api/game_result_player/1
+
+###
+GET http://localhost:3001/api/leaderBoard
+
+###
+POST http://localhost:3001/api/game_result
 content-type: application/json
+
+{
+  "coin": 100,
+  "id_station_start": 1,
+  "id_station_end": 2
+}
+
+###
+GET http://localhost:3001/api/routes
+

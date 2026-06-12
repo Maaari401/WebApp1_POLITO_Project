@@ -1,0 +1,119 @@
+{
+  "eventi_metropolitana": [
+    {
+      "title": "Blackout in galleria",
+      "test": "Il treno si ferma improvvisamente a metà del tunnel per un guasto elettrico. Le luci si spengono, l'aria condizionata smette di funzionare e l'attesa nel buio sembra infinita.",
+      "bonus": -4
+    },
+    {
+      "title": "L'Oasi del pendolare",
+      "test": "In piena ora di punta, mentre la banchina è stracolma di gente stressata, si aprono le porte davanti a te e rivelano un vagone inspiegabilmente vuoto, pulitissimo e con la temperatura ideale.",
+      "bonus": 3
+    },
+    {
+      "title": "La beffa della coincidenza",
+      "test": "Scendi di corsa le scale per cambiare linea e prendere la coincidenza, ma vedi la coda del treno allontanarsi proprio sotto il tuo naso. Il tabellone indica: 'Prossimo treno tra 14 minuti'.",
+      "bonus": -3
+    },
+    {
+      "title": "La colonna sonora perfetta",
+      "test": "Un talentuoso musicista di strada sale a bordo e inizia a suonare una versione acustica bellissima di un brano che adori. Il viaggio diventa magicamente più rilassante.",
+      "bonus": 2
+    },
+    {
+      "title": "Incidente da frenata",
+      "test": "Il macchinista effettua una frenata brusca e inaspettata. Il passeggero di fianco a te perde l'equilibrio e ti rovescia mezzo bicchiere di caffè caldo direttamente sulle scarpe.",
+      "bonus": -2
+    },
+    {
+      "title": "Escursione forzata",
+      "test": "Nel lungo corridoio sotterraneo che unisce due linee, scopri che i tapis roulant e le scale mobili sono guasti. Ti aspetta una scalinata infinita da fare a piedi.",
+      "bonus": -2
+    },
+    {
+      "title": "Pet therapy metropolitana",
+      "test": "Un dolcissimo Golden Retriever sale con il suo padrone, si siede proprio vicino a te e ti appoggia il muso sul ginocchio in cerca di coccole per l'intera durata della tratta.",
+      "bonus": 3
+    },
+    {
+      "title": "La stazione fantasma",
+      "test": "L'altoparlante gracchia un messaggio del tutto incomprensibile. Capisci cosa stava dicendo solo quando il treno tira dritto e salta la tua fermata per 'motivi di ordine pubblico'.",
+      "bonus": -4
+    },
+    {
+      "title": "Il vicino molesto",
+      "test": "Sei costretto a sederti vicino a un tizio che guarda video sul telefono a tutto volume senza auricolari e mastica rumorosamente una gomma per tutto il tempo.",
+      "bonus": -2
+    },
+    {
+      "title": "La lotteria del clima",
+      "test": "Sali nel vagone e scopri che il sistema di climatizzazione è impazzito. Ti ritrovi in una 'Cella Frigorifera' in pieno inverno, oppure in una 'Sauna Finlandese' a metà luglio. Il treno è pieno e non puoi cambiare carrozza.",
+      "bonus": -3
+    },
+    {
+      "title": "Il bambino prodigio",
+      "test": "Un bambino di non più di sei anni sale con la nonna e inizia a raccontarle con entusiasmo la trama di un libro che ha letto. La sua fantasia e le sue parole ti strappano più di un sorriso per tutta la tratta.",
+      "bonus": 1
+    },
+    {
+      "title": "Upgrade a sorpresa",
+      "test": "Stai aspettando il solito convoglio vecchio e sgangherato, ma dal tunnel spunta il modello nuovissimo appena varato. Più spazio, sedili ergonomici, illuminazione rilassante e insonorizzazione perfetta. Il destino ti sorride.",
+      "bonus": 2
+    },
+    {
+      "title": "Spettacolo fuori programma",
+      "test": "La tua linea della metropolitana prevede un breve tratto in superficie. Il treno esce dal buio esattamente nel momento in cui c'è un tramonto spettacolare o un arcobaleno nitidissimo sulla città.",
+      "bonus": 3
+    },
+    {
+      "title": "Il profumo del caffè",
+      "test": "Una signora sale con un sacchetto di cornetti appena sfornati da una pasticceria. Il profumo si diffonde nell'intero vagone e per qualche minuto la metropolitana odora di colazione.",
+      "bonus": 1
+    },
+    {
+      "title": "Il posto salvato",
+      "test": "Sali sul treno affollatissimo e una persona gentile ti indica il posto libero accanto a lei che stava tenendo d'occhio per qualcuno che non è mai arrivato. Ti siedi e viaggi comodamente.",
+      "bonus": 2
+    },
+    {
+      "title": "La coincidenza perfetta",
+      "test": "Arrivi sul binario senza fretta e il treno entra in stazione esattamente in quel momento. Le porte si aprono proprio davanti a te. Non hai aspettato neanche un secondo.",
+      "bonus": 3
+    },
+    {
+      "title": "Lavori in corso",
+      "test": "La linea è parzialmente interrotta per lavori notturni prolungati. Sei costretto a scendere due fermate prima e completare il tragitto con un bus sostitutivo lentissimo e strapieno.",
+      "bonus": -3
+    },
+    {
+      "title": "Il ritardo infinito",
+      "test": "Il tabellone segna prima 5 minuti, poi 8, poi 12. Il treno non arriva mai e la banchina si riempie sempre di più. Quando finalmente arriva, è talmente pieno che quasi non riesci a salire.",
+      "bonus": -4
+    },
+    {
+      "title": "Incontro fortunato",
+      "test": "Per puro caso ti ritrovi seduto accanto a un vecchio amico che non vedevi da anni. La chiacchierata è così piacevole che quasi ti dimentichi di scendere alla tua fermata.",
+      "bonus": 4
+    },
+    {
+      "title": "Il flash mob",
+      "test": "In una stazione centrale un gruppo di musicisti inizia improvvisamente un flash mob orchestrale. I passeggeri si fermano stupiti, qualcuno sorride, qualcuno filma. Per qualche minuto la metropolitana diventa un teatro.",
+      "bonus": 2
+    },
+    {
+      "title": "Il libro dimenticato",
+      "test": "Trovi sul sedile un romanzo abbandonato, aperto proprio a metà. Il title ti incuriosisce, inizi a leggere qualche riga per curiosità e non riesci più a smettere. Lo porti a casa.",
+      "bonus": 2
+    },
+    {
+      "title": "La corsa salvata",
+      "test": "Stai per perdere il treno, corri affannato verso le porte che si stanno chiudendo. Un passeggero le tiene aperte con la mano rischiando una multa. Ce la fai per un soffio.",
+      "bonus": 2
+    },
+    {
+      "title": "Vista mozzafiato",
+      "test": "Il treno sopraelevato percorre un viadotto con una vista panoramica sulla città che non avevi mai notato prima. La luce del mattino illumina i tetti in modo spettacolare.",
+      "bonus": 2
+    }
+  ]
+}

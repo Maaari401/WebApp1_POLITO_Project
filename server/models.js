@@ -20,18 +20,20 @@ function User(id, username, email, firstname, lastname, date) {
     this.lastname = lastname;
     this.date = dayjs(date);
 }
-function Event(id, text, bonus){
+function Event(id, title, text, bonus){
     this.id = id;
     this.title = title;
     this.text = text;
     this.bonus = bonus;
 }
 
-function Game_Result(id, date, player_id, coin){
+function Game_Result(id, date, player_id, coin, id_station_start, id_station_end){
     this.id = id;
     this.date = date;
     this.player_id = player_id;
     this.coin = coin;
+    this.id_station_start = id_station_start;
+    this.id_station_end = id_station_end;
 }
 
 
