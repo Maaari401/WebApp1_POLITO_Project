@@ -18,12 +18,15 @@ import {
     getPlayerResults, getRoutes,
     getStationById,
     getStations,
-    getUser
+    getUser,
+    getValidity,
+    getValidStationPairs
 } from "./dao.js";
 
 // init
 const app = express();
 const port = 3001;
+const MIN_ROUTES = 3
 
 // middlewares
 app.use(express.json());
@@ -159,31 +162,6 @@ app.get("/api/event/:id", isLoggedIn, [check("id").isInt().withMessage("The id m
         return res.status(503).json({ error: err.message });
     }
 });
-/*
-//GET /api/random_event
-app.get("/api/random_event", isLoggedIn, async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty())
-        return res.status(422).json({ errors: errors.array() });
-    try {
-        const events = await getRandomEvent()
-        return res.status(200).json(events[Math.floor(Math.random() * events.length)]);
-    } catch (err) {
-        return res.status(503).json({ error: err.message });
-    }
-});
-*/
-
-
-
-
-
-
-
-
-
-
-
 
 
 //GET /api/game_result_player
@@ -216,47 +194,6 @@ app.get("/api/leaderBoard", isLoggedIn, async (req, res) => {
         return res.status(503).json({ error: err.message });
     }
 });
-/*
-// POST /api/game_result
-app.post("/api/game_result", isLoggedIn, [
-    check("coin").isNumeric().withMessage("Coin must be a number"),
-    check("id_station_start").isNumeric().withMessage("Start station is required"),
-    check("id_station_end").isNumeric().withMessage("End station is required"),
-], async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty())
-        return res.status(422).json({ errors: errors.array() });
-    
-    try {
-        const stationStart = await getStationById(req.body.id_station_start);
-        if (!stationStart)
-            return res.status(404).json({ error: "Start station not found" });
-    } catch (err) {
-        return res.status(503).json({ error: err.message });
-    }
-    
-    try {
-        const stationEnd = await getStationById(req.body.id_station_end);
-        if (!stationEnd)
-            return res.status(404).json({ error: "End station not found" });
-    } catch (err) {
-        return res.status(503).json({ error: err.message });
-    }
-    
-    try {
-        const result = await addResult(
-            dayjs().format("YYYY-MM-DD HH:mm:ss"),
-            req.user.id, //player id is taken from the user session due to security issue by allowing fake user values.
-            req.body.coin,
-            req.body.id_station_start,
-            req.body.id_station_end
-        );
-        return res.status(201).json(result);
-    } catch (err) {
-        return res.status(503).json({ error: err.message });
-    }
-});
-*/
 
 //GET /api/routes
 app.get("/api/routes", isLoggedIn, async (req, res) => {
@@ -270,11 +207,44 @@ app.get("/api/routes", isLoggedIn, async (req, res) => {
         return res.status(503).json({ error: err.message });
     }
 });
+//POST /api/game/start
+app.post("/api/game/start", isLoggedIn, async (req, res) => {
+    try {
+        const validPairs = await getValidStationPairs(MIN_ROUTES);
+        
+        if (validPairs.length === 0)
+            return res.status(500).json({ error: "No valid start/end pairs found in the network" });
+        
+        const pair = validPairs[Math.floor(Math.random() * validPairs.length)];
+        const saved = await addResult(req.user.id, null, pair.start, pair.end, dayjs().format("YYYY-MM-DD HH:mm:ss"))
+        
+        return res.status(201).json({
+            game_id: saved.id,
+            start: pair.start,
+            end:   pair.end,
+        });
+        
+    } catch (err) {
+        return res.status(503).json({ error: err.message });
+    }
+});
+//POST /api/game/submit
+app.post("/api/game/submit", isLoggedIn, async (req, res) => {
+    try {
+        const validity = await getValidity(req.body.game_id, req.body.path, req.user.id);
+        
+        if (!validity.valid)
+            return res.status(500).json({ error: validity.reason });
+        
+        
+        
+    } catch (err) {
+        return res.status(503).json({ error: err.message });
+    }
+});
 
 
 // activate the server
 app.listen(port, () => {
   console.log(`API Server listening at http://localhost:${port}`);
 });
-
-

@@ -70,3 +70,6 @@ content-type: application/json
 ###
 GET http://localhost:3001/api/routes
 
+
+###
+POST http://localhost:3001/api/game/start

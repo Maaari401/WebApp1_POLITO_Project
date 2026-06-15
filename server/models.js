@@ -6,10 +6,10 @@ function Station(id, name) {
     this.name = name;
 }
 
-function Route(id, start_station_id, end_station_id){
+function Route(id, id_station_start, id_station_end){
     this.id = id;
-    this.start_station_id = start_station_id;
-    this.end_station_id = end_station_id;
+    this.id_station_start = id_station_start;
+    this.id_station_end = id_station_end;
 }
 
 function User(id, username, email, firstname, lastname, date) {
@@ -27,14 +27,27 @@ function Event(id, title, text, bonus){
     this.bonus = bonus;
 }
 
-function Game_Result(id, date, player_id, coin, id_station_start, id_station_end){
+function Game_Result(id, player_id, coin, id_station_start, id_station_end, started_at){
     this.id = id;
-    this.date = date;
     this.player_id = player_id;
     this.coin = coin;
     this.id_station_start = id_station_start;
     this.id_station_end = id_station_end;
+    this.started_at = started_at;
 }
 
 
-export {Station, User, Route, Event, Game_Result};
+function Leg(from, to) {
+    this.from = from;
+    this.to = to;
+}
+
+
+function Path(game_id, legs) {
+    this.game_id = game_id;
+    this.legs = legs; // Leg[]
+}
+
+
+
+export {Station, User, Route, Event, Game_Result, Leg, Path};

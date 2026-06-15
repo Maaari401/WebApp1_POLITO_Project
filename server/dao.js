@@ -2,10 +2,13 @@
 import sqlite from "sqlite3";
 import crypto from "crypto";
 import {Station, User, Event, Route, Game_Result} from "./models.js";
+import dayjs from "dayjs";
 
 const db = new sqlite.Database("UltimaCorsa.sqlite", (err) => {
     if (err) throw err;
 });
+const PLAYTIME = 90;
+
 
 
 /* USERS */
@@ -122,12 +125,12 @@ export const getPlayerResults = (player_id) => {
     });
 }
 
-export const addResult = (date, player_id, coin, id_station_start, id_station_end) => {
+export const addResult = (player_id, coin, id_station_start, id_station_end, started_at) => {
     return new Promise((resolve, reject) => {
-        const sql = "INSERT INTO game_result (date, player_id, coin, id_station_start, id_station_end) VALUES (?, ?, ?, ?, ?)";
-        db.run(sql, [date, player_id, coin, id_station_start, id_station_end], function (err) {
+        const sql = "INSERT INTO game_result (player_id, coin, id_station_start, id_station_end, started_at) VALUES ( ?, ?, ?, ?,?)";
+        db.run(sql, [player_id, coin, id_station_start, id_station_end, started_at], function (err) {
             if (err) reject(err);
-            else resolve( new Game_Result(this.id, date, player_id, coin, id_station_start, id_station_end));
+            else resolve( new Game_Result(this.id, player_id, coin, id_station_start, id_station_end, started_at));
         });
     });
 }
@@ -139,7 +142,7 @@ export const getLeaderboard = () => {
             if (err) {
                 reject(err);
             } else {
-                resolve(rows.map(row => new Game_Result(row.id, row.date, row.player_id, row.coin, row.id_station_start, row.id_station_end)));
+                resolve(rows.map(row => new Game_Result(row.id, row.player_id, row.coin, row.id_station_start, row.id_station_end)));
             }
         });
     });
@@ -157,3 +160,98 @@ export const getRoutes = () => {
         });
     });
 }
+
+
+export const getValidStationPairs = async (minRoutes) => {
+    const [stations, routes] = await Promise.all([getStations(), getRoutes()]);
+    
+    const graph = {};
+    for (const s of stations) graph[s.id] = [];
+    for (const r of routes) {
+        graph[r.id_station_start].push(r.id_station_end);
+        graph[r.id_station_end].push(r.id_station_start);
+    }
+    
+    const bfs = (startId) => {
+        const dist = { [startId]: 0 };
+        const queue = [startId];
+        while (queue.length) {
+            const curr = queue.shift();
+            for (const neighbor of graph[curr]) {
+                if (dist[neighbor] === undefined) {
+                    dist[neighbor] = dist[curr] + 1;
+                    queue.push(neighbor);
+                }
+            }
+        }
+        return dist;
+    };
+    
+    const validPairs = [];
+    for (const s of stations) {
+        const dist = bfs(s.id);
+        for (const [targetId, d] of Object.entries(dist)) {
+            if (d >= minRoutes && Number(targetId) !== s.id)
+                validPairs.push({ start: s.id, end: Number(targetId) });
+        }
+    }
+    
+    return validPairs;
+};
+
+const getGameFromId = (game_id) => {
+    return new Promise((resolve, reject) => {
+        const sql = "SELECT * FROM game_result WHERE id = ?";
+        db.get(sql, [game_id], (err, row) => {
+            if (err) {
+                reject(err);
+            } else if (!row) {
+                resolve(null); // or reject(new Error("Game not found"));
+            } else {
+                resolve(
+                    new Game_Result(
+                        row.id,
+                        row.player_id,
+                        row.coin,
+                        row.id_station_start,
+                        row.id_station_end,
+                        row.started_at
+                    )
+                );
+            }
+        });
+    });
+}
+
+export const getValidity = async (game_id, path, player_id) => {
+    const [game_result, routes] = await Promise.all([getGameFromId(game_id), getRoutes()]);
+    
+    if (game_result.player_id !== player_id)
+        return { valid: false, reason: "Unauthorized" };
+    
+    const elapsed = dayjs().diff(dayjs(game_result.started_at, "YYYY-MM-DD HH:mm:ss"), 'second');
+    if (elapsed > PLAYTIME + 2) //2 second of buffer for data processing and data transferring
+        return { valid: false, reason: "Time expired" };
+    
+    if (path.legs[0].from !== game_result.id_station_start)
+        return { valid: false, reason: "Wrong start station" };
+    if (path.legs[path.legs.length - 1].to !== game_result.id_station_end)
+        return { valid: false, reason: "Wrong end station" };
+    
+    
+    for (let i = 0; i < path.legs.length - 1; i++) {
+        if (path.legs[i].to !== path.legs[i + 1].from)
+            return { valid: false, reason: `Path is not contiguous at step ${i + 1}` };
+    }
+    
+    for (const leg of path.legs) {
+        const exists = routes.some(r =>
+            (r.start_station_id === leg.from && r.end_station_id === leg.to) ||
+            (r.start_station_id === leg.to   && r.end_station_id === leg.from)
+        );
+        if (!exists)
+            return { valid: false, reason: `Leg ${leg.from} → ${leg.to} does not exist` };
+    }
+    
+    return { valid: true };
+};
