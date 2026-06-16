@@ -44,8 +44,11 @@ GET http://localhost:3001/api/stations
 ### Event Details (id)
 GET http://localhost:3001/api/event/1
 
-### Result Of Playter (id)
+### Games Of Player (id)
 GET http://localhost:3001/api/game_result_player/1
+
+### Get details about each ride of the game
+GET http://localhost:3001/api/game/4/rides
 
 ### leaderBoard
 GET http://localhost:3001/api/leaderBoard
@@ -74,3 +77,5 @@ content-type: application/json
     ]
   }
 }
+
+

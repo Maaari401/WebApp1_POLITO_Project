@@ -254,6 +254,38 @@ export const getValidity = async (game_id, path, player_id) => {
     return { valid: true };
 };
 
+const addGameRides = (game_id, ridesWithEvents) => {
+    return new Promise((resolve, reject) => {
+        const statementQuery = db.prepare(
+            "INSERT INTO game_ride (game_result_id, from_station, to_station, event_id, ride_order) VALUES (?, ?, ?, ?, ?)"
+        );
+        ridesWithEvents.forEach((r, i) => statementQuery.run([game_id, r.from, r.to, r.event_id, i], (err) => { if (err) reject(err); }));
+        statementQuery.finalize((err) => { if (err) reject(err); else resolve(); });
+    });
+};
+
+export const getGameRides = (game_id) => {
+    return new Promise((resolve, reject) => {
+        const sql = `
+            SELECT gr.ride_order, gr.from_station, gr.to_station,
+                   e.id as event_id, e.title, e.text, e.bonus
+            FROM game_ride gr
+            JOIN event e ON e.id = gr.event_id
+            WHERE gr.game_result_id = ?
+            ORDER BY gr.ride_order
+        `;
+        db.all(sql, [game_id], (err, rows) => {
+            if (err) reject(err);
+            else resolve(rows.map(r => ({
+                ride_order: r.ride_order,
+                from: r.from_station,
+                to: r.to_station,
+                event_id: new Event(r.event_id, r.title, r.text, r.bonus),
+            })));
+        });
+    });
+};
+
 export const calculateGamePoints = async (game_id, path) => {
     const events = await getRandomEvents(path.rides.length);
 
@@ -271,6 +303,7 @@ export const calculateGamePoints = async (game_id, path) => {
             else resolve();
         });
     });
+    await addGameRides(game_id, ridesWithEvents);
 
     return { coin, ridesWithEvents };
 }

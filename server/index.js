@@ -13,6 +13,7 @@ import {
     addResult, calculateGamePoints,
     createUser,
     getEventById,
+    getGameRides,
     getLeaderboard,
     getPlayerResults, getRoutes,
     getStationById,
@@ -207,6 +208,19 @@ app.get("/api/routes", isLoggedIn, async (req, res) => {
     }
 });
 
+
+//GET /api/game/:id/rides
+app.get("/api/game/:id/rides", isLoggedIn, [check("id").isInt().withMessage("The id must be an int")], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+        return res.status(422).json({ errors: errors.array() });
+    try {
+        const rides = await getGameRides(Number(req.params.id));
+        return res.status(200).json(rides);
+    } catch (err) {
+        return res.status(503).json({ error: err.message });
+    }
+});
 
 //POST /api/game/start
 app.post("/api/game/start", isLoggedIn, async (req, res) => {
