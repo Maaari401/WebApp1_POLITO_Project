@@ -37,9 +37,14 @@ function Game_Result(id, player_id, coin, id_station_start, id_station_end, star
 }
 
 
-function Leg(from, to) {
+function Ride(from, to) {
     this.from = from;
     this.to = to;
+}
+function Ride_with_event(from, to, event_id){
+    this.from = from;
+    this.to = to;
+    this.event_id = event_id;
 }
 
 
@@ -50,4 +55,4 @@ function Path(game_id, legs) {
 
 
 
-export {Station, User, Route, Event, Game_Result, Leg, Path};
+export {Station, User, Route, Event, Game_Result, Ride, Path, Ride_with_event};

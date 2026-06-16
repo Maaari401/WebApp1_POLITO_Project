@@ -10,10 +10,9 @@ import dayjs from "dayjs";
 import cors from "cors";
 
 import {
-    addResult,
+    addResult, calculateGamePoints,
     createUser,
     getEventById,
-    getEvents,
     getLeaderboard,
     getPlayerResults, getRoutes,
     getStationById,
@@ -207,6 +206,8 @@ app.get("/api/routes", isLoggedIn, async (req, res) => {
         return res.status(503).json({ error: err.message });
     }
 });
+
+
 //POST /api/game/start
 app.post("/api/game/start", isLoggedIn, async (req, res) => {
     try {
@@ -232,12 +233,15 @@ app.post("/api/game/start", isLoggedIn, async (req, res) => {
 app.post("/api/game/submit", isLoggedIn, async (req, res) => {
     try {
         const validity = await getValidity(req.body.game_id, req.body.path, req.user.id);
-        
         if (!validity.valid)
             return res.status(500).json({ error: validity.reason });
-        
-        
-        
+        const { coin, ridesWithEvents } = await calculateGamePoints(req.body.game_id, req.body.path);
+
+        res.status(200).json({
+            valid: validity.valid,
+            coin,
+            path: ridesWithEvents
+        })
     } catch (err) {
         return res.status(503).json({ error: err.message });
     }

@@ -1,13 +1,14 @@
 
 import sqlite from "sqlite3";
 import crypto from "crypto";
-import {Station, User, Event, Route, Game_Result} from "./models.js";
+import {Station, User, Event, Route, Game_Result, Ride_with_event} from "./models.js";
 import dayjs from "dayjs";
 
 const db = new sqlite.Database("UltimaCorsa.sqlite", (err) => {
     if (err) throw err;
 });
 const PLAYTIME = 90;
+const COIN_BASE = 20;
 
 
 
@@ -98,15 +99,12 @@ export const getEventById = (id) => {
     });
 }
 
-export const getEvents = () => {
+export const getRandomEvents = (n) => {
     return new Promise((resolve, reject) => {
-        const sql = "SELECT * FROM event ";
-        db.all(sql, (err, rows) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(rows.map(row => new Event(row.id, row.title, row.text, row.bonus)));
-            }
+        const sql = "SELECT * FROM event ORDER BY RANDOM() LIMIT ?";
+        db.all(sql, [n], (err, rows) => {
+            if (err) reject(err);
+            else resolve(rows.map(r => new Event(r.id, r.title, r.text, r.bonus)));
         });
     });
 }
@@ -130,7 +128,7 @@ export const addResult = (player_id, coin, id_station_start, id_station_end, sta
         const sql = "INSERT INTO game_result (player_id, coin, id_station_start, id_station_end, started_at) VALUES ( ?, ?, ?, ?,?)";
         db.run(sql, [player_id, coin, id_station_start, id_station_end, started_at], function (err) {
             if (err) reject(err);
-            else resolve( new Game_Result(this.id, player_id, coin, id_station_start, id_station_end, started_at));
+            else resolve( new Game_Result(this.lastID, player_id, coin, id_station_start, id_station_end, started_at));
         });
     });
 }
@@ -233,25 +231,46 @@ export const getValidity = async (game_id, path, player_id) => {
     if (elapsed > PLAYTIME + 2) //2 second of buffer for data processing and data transferring
         return { valid: false, reason: "Time expired" };
     
-    if (path.legs[0].from !== game_result.id_station_start)
+    if (path.rides.length === 0)
+        return { valid: false, reason: "The provided path is empty" };
+    
+    if (path.rides[0].from !== game_result.id_station_start)
         return { valid: false, reason: "Wrong start station" };
-    if (path.legs[path.legs.length - 1].to !== game_result.id_station_end)
+    if (path.rides[path.rides.length - 1].to !== game_result.id_station_end)
         return { valid: false, reason: "Wrong end station" };
     
     
-    for (let i = 0; i < path.legs.length - 1; i++) {
-        if (path.legs[i].to !== path.legs[i + 1].from)
+    for (let i = 0; i < path.rides.length - 1; i++) {
+        if (path.rides[i].to !== path.rides[i + 1].from)
             return { valid: false, reason: `Path is not contiguous at step ${i + 1}` };
     }
     
-    for (const leg of path.legs) {
-        const exists = routes.some(r =>
-            (r.start_station_id === leg.from && r.end_station_id === leg.to) ||
-            (r.start_station_id === leg.to   && r.end_station_id === leg.from)
-        );
+    for (const ride of path.rides) {
+        const exists = routes.some(r => r.id_station_start === ride.from && r.id_station_end === ride.to);
         if (!exists)
-            return { valid: false, reason: `Leg ${leg.from} → ${leg.to} does not exist` };
+            return { valid: false, reason: `ride ${ride.from} → ${ride.to} does not exist` };
     }
     
     return { valid: true };
 };
+
+export const calculateGamePoints = async (game_id, path) => {
+    const events = await getRandomEvents(path.rides.length);
+
+    let coin = COIN_BASE;
+
+    const ridesWithEvents = path.rides.map((ride, i) => {
+        const ev = events[i % events.length];
+        coin += ev.bonus;
+        return new Ride_with_event(ride.from, ride.to, ev.id);
+    });
+    await new Promise((resolve, reject) => {
+        const sql = "UPDATE game_result SET coin = ? WHERE id = ?";
+        db.run(sql, [coin, game_id], (err) => {
+            if (err) reject(err);
+            else resolve();
+        });
+    });
+
+    return { coin, ridesWithEvents };
+}

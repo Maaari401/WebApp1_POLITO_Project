@@ -6,3 +6,6 @@ node_modules/
 Thumbs.db
 Desktop.ini
 /server/questions.sqlite
+/.claude
+/.idea
+/.idea/

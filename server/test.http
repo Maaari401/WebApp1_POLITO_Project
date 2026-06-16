@@ -1,6 +1,5 @@
 
-###
-#register a new user
+### Registration
 POST http://localhost:3001/api/users
 content-type: application/json
 
@@ -26,50 +25,52 @@ content-type: application/json
 }
 
 
-###
-
+### Get Status
 GET http://localhost:3001/api/sessions/current
 
-###
-
+### Logout
 DELETE http://localhost:3001/api/sessions/current
 
 
 
 
-###
+### Station details id
 GET http://localhost:3001/api/station/1
 
-###
+### Station List
 GET http://localhost:3001/api/stations
 
 
-###
+### Event Details (id)
 GET http://localhost:3001/api/event/1
 
-###
-GET http://localhost:3001/api/events
-
-
-###
+### Result Of Playter (id)
 GET http://localhost:3001/api/game_result_player/1
 
-###
+### leaderBoard
 GET http://localhost:3001/api/leaderBoard
 
-###
-POST http://localhost:3001/api/game_result
-content-type: application/json
 
-{
-  "coin": 100,
-  "id_station_start": 1,
-  "id_station_end": 2
-}
-
-###
+### All Routes
 GET http://localhost:3001/api/routes
 
 
-###
+### NewGame
 POST http://localhost:3001/api/game/start
+
+
+### SubmitGame (14 -> 7)
+POST localhost:3001/api/game/submit
+content-type: application/json
+
+{
+  "game_id": 4,
+  "path": {
+    "rides": [
+      {"from": 14, "to": 13},
+      {"from": 13, "to": 11},
+      {"from": 11, "to": 10},
+      {"from": 10, "to": 7}
+    ]
+  }
+}
