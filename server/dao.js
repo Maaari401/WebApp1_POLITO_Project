@@ -204,7 +204,7 @@ const getGameFromId = (game_id) => {
             if (err) {
                 reject(err);
             } else if (!row) {
-                resolve(null); // or reject(new Error("Game not found"));
+                resolve(null); // or reject(new Error("Game.jsx not found"));
             } else {
                 resolve(
                     new Game_Result(
