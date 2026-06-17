@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import API from "../api/api.js";
+import API from "../api/API.js";
 
 export function Register() {
     const navigate = useNavigate();
@@ -60,7 +60,9 @@ export function Register() {
                 </div>
                 <div className="form-actions">
                     <button type="submit">Registrati</button>
-                    <Link to="/login">Hai già un account?</Link>
+                </div>
+                <div className="form-actions">
+                    <Link to="/login">Hai già un Account?</Link>
                 </div>
             </form>
         </div>

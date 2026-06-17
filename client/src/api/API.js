@@ -82,8 +82,8 @@ const getLeaderboard = async () => {
     return res.json();
 };
 
-const getPlayerResults = async () => {
-    const res = await fetch(`${SERVER}/api/game_result_player`, { credentials: "include" });
+const getPlayerResults = async (player_id) => {
+    const res = await fetch(`${SERVER}/api/game_result_player/${player_id}`, { credentials: "include" });
     if (!res.ok) await handleError(res);
     const data = await res.json();
     return data.map((g) => new Game_Result(g.id, g.player_id, g.coin, g.id_station_start, g.id_station_end, g.started_at));

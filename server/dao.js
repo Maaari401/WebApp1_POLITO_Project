@@ -117,7 +117,7 @@ export const getPlayerResults = (player_id) => {
             if (err) {
                 reject(err);
             } else {
-                resolve(rows.map(row => new Game_Result(row.id, row.date, row.player_id, row.coin, row.id_station_start, row.id_station_end)));
+                resolve(rows.map(row => new Game_Result(row.id, row.player_id, row.coin, row.id_station_start, row.id_station_end, row.started_at)));
             }
         });
     });
@@ -135,12 +135,12 @@ export const addResult = (player_id, coin, id_station_start, id_station_end, sta
 
 export const getLeaderboard = () => {
     return new Promise((resolve, reject) => {
-        const sql = "SELECT * FROM game_result GROUP BY player_id HAVING MAX(coin) ORDER BY coin DESC";
+        const sql = "SELECT gr.*, u.username FROM game_result gr JOIN user u ON gr.player_id = u.id WHERE (gr.coin >= 0 and gr.coin IS NOT NULL) GROUP BY gr.player_id HAVING MAX(gr.coin) ORDER BY gr.coin DESC, gr.started_at ASC";
         db.all(sql, (err, rows) => {
             if (err) {
                 reject(err);
             } else {
-                resolve(rows.map(row => new Game_Result(row.id, row.player_id, row.coin, row.id_station_start, row.id_station_end)));
+                resolve(rows.map(row => new Game_Result(row.id, row.player_id, row.coin, row.id_station_start, row.id_station_end, row.started_at, row.username)));
             }
         });
     });
@@ -296,6 +296,14 @@ export const calculateGamePoints = async (game_id, path) => {
         coin += ev.bonus;
         return new Ride_with_event(ride.from, ride.to, ev.id);
     });
+    if(coin < 0) coin = 0;
+    await updateResultCoin(game_id, coin);
+    await addGameRides(game_id, ridesWithEvents);
+
+    return { coin, ridesWithEvents };
+}
+
+export const updateResultCoin = async (game_id, coin) => {
     await new Promise((resolve, reject) => {
         const sql = "UPDATE game_result SET coin = ? WHERE id = ?";
         db.run(sql, [coin, game_id], (err) => {
@@ -303,7 +311,4 @@ export const calculateGamePoints = async (game_id, path) => {
             else resolve();
         });
     });
-    await addGameRides(game_id, ridesWithEvents);
-
-    return { coin, ridesWithEvents };
 }

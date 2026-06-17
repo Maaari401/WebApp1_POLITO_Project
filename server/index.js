@@ -20,7 +20,8 @@ import {
     getStations,
     getUser,
     getValidity,
-    getValidStationPairs
+    getValidStationPairs,
+    updateResultCoin
 } from "./dao.js";
 
 // init
@@ -165,7 +166,7 @@ app.get("/api/event/:id", isLoggedIn, [check("id").isInt().withMessage("The id m
 
 
 //GET /api/game_result_player
-app.get("/api/game_result_player", isLoggedIn, async (req, res) => {
+app.get("/api/game_result_player/:id", isLoggedIn, async (req, res) => {
     const errors = validationResult(req);
     
     if (!errors.isEmpty())
@@ -248,8 +249,10 @@ app.post("/api/game/start", isLoggedIn, async (req, res) => {
 app.post("/api/game/submit", isLoggedIn, async (req, res) => {
     try {
         const validity = await getValidity(req.body.game_id, req.body.path, req.user.id);
-        if (!validity.valid)
-            return res.status(200).json({ valid: validity.valid, error: validity.reason});
+        if (!validity.valid) {
+            await updateResultCoin(req.body.game_id, -1);
+            return res.status(200).json({valid: validity.valid, error: validity.reason});
+        }
         const { coin, ridesWithEvents } = await calculateGamePoints(req.body.game_id, req.body.path);
 
         res.status(200).json({

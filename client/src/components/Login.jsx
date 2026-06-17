@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { UserContext } from "../App.jsx";
-import API from "../api/api.js";
+import API from "../api/API.js";
 
 export const Login = () => {
     const { login } = useContext(UserContext);
@@ -16,7 +16,7 @@ export const Login = () => {
         try {
             const user = await API.login(username, password);
             login(user);
-            navigate("/dashboard");
+            navigate("/userDetails");
         } catch (err) {
             setError(err.message);
         }

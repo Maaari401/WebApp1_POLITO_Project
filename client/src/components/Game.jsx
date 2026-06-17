@@ -1,9 +1,10 @@
-import {use, useContext, useEffect, useMemo, useState} from "react";
+import {use, useContext, useEffect, useMemo, useRef, useState} from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../App.jsx";
-import API from "../api/api.js";
+import API from "../api/API.js";
 import mapImage from "../../images/mappa.png";
 import mapNoLines from "../../images/mappaStazioni.png";
+import {LeaderBoard} from "./LeaderBoard.jsx";
 
 // phase 0 — regole
 const PhaseRules = ({ onGioca }) => (
@@ -42,9 +43,6 @@ const PhaseRules = ({ onGioca }) => (
         </ul>
         <div className="panel-footer">
             <button className="btn-play-seal" onClick={onGioca}>
-                <svg className="gear-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                    <path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7zm9.4 3.5c0 .66-.06 1.3-.16 1.92l2.05 1.6-2 3.46-2.42-.98c-.99.86-2.16 1.5-3.43 1.86L15 22h-4l-.44-2.64c-1.27-.36-2.44-1-3.43-1.86l-2.42.98-2-3.46 2.05-1.6A8.6 8.6 0 0 1 2.6 12c0-.66.06-1.3.16-1.92L.71 8.48l2-3.46 2.42.98C6.12 5.14 7.29 4.5 8.56 4.14L9 1.5h4l.44 2.64c1.27.36 2.44 1 3.43 1.86l2.42-.98 2 3.46-2.05 1.6c.1.62.16 1.26.16 1.92z"/>
-                </svg>
                 <span>Gioca</span>
             </button>
         </div>
@@ -204,6 +202,7 @@ const PhaseViaggio = ({ result, onContinua, onRigioca }) => {
     const [events, setEvents] = useState(null);
     const [rideCount, setRideCount] = useState(1)
     const [coin, setCoin] = useState(20)
+    const lastHopRef = useRef(null);
     
     const isValid = result?.valid === true;
 
@@ -232,7 +231,10 @@ const PhaseViaggio = ({ result, onContinua, onRigioca }) => {
         setRideCount(newCount);
         setCoin(events.slice(0, newCount).reduce((acc, e) => acc + e.bonus, 20));
     }
-    
+
+    useEffect(() => {
+        lastHopRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }, [rideCount]);
 
     const sn = (id) => stationMap.get(Number(id)) ?? `#${id}`;
 
@@ -253,7 +255,7 @@ const PhaseViaggio = ({ result, onContinua, onRigioca }) => {
                 <>
                     <div className="viaggio-list">
                         {result.path.slice(0, rideCount).map((hop, i) => (
-                            <div key={i} className="viaggio-hop">
+                            <div key={i} className="viaggio-hop" ref={i === rideCount - 1 ? lastHopRef : null}>
                                 <span className="viaggio-hop-num">{i + 1}</span>
                                 <div className="viaggio-hop-body">
                                     <span className="viaggio-hop-route">{sn(hop.from)} → {sn(hop.to)}</span>
@@ -272,11 +274,7 @@ const PhaseViaggio = ({ result, onContinua, onRigioca }) => {
                             <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5l8 7-8 7"/></svg>
                         </button>
                     )}
-                    {rideCount === result.path.length && (
-                        <div className="viaggio-summary">
-                        <span className="viaggio-summary-label">Monete finali</span>
-                        <span className="viaggio-summary-coins">{result.coin}</span>
-                    </div>)}
+                    
                 </>
             )}
             <div className="panel-footer">
@@ -297,11 +295,18 @@ const PhaseViaggio = ({ result, onContinua, onRigioca }) => {
 };
 
 // phase 4 — traguardo: stub
-const PhaseTraguardo = ({ onRigioca }) => (
+const PhaseTraguardo = ({result, onRigioca }) => (
+    
     <section className="panel" aria-label="Traguardo">
         <h2 className="rules-header">Traguardo</h2>
-        <div className="rules-divider"><span></span></div>
-        {/* TODO: punteggio finale */}
+        
+        {/* TODO: punteggio finale + current status in leaderboard*/}
+        
+            <div className="viaggio-summary">
+                <span className="viaggio-summary-label">Monete finali</span>
+                <span className="viaggio-summary-coins">{result?.coin}</span>
+            </div>
+        <LeaderBoard/>
         <div className="panel-footer">
             <button className="btn-play-seal" onClick={onRigioca}>
                 <span>Ancora</span>
@@ -381,7 +386,7 @@ export const Game = () => {
             {phase === 1 && <PhasePreparazione onReady={() => handlePianification()} />}
             {phase === 2 && <PhasePianificazione game={game} onSubmit={handleSubmitPianification} />}
             {phase === 3 && <PhaseViaggio result={result} onContinua={() => setPhase(4)} onRigioca={handleRigioca}/>}
-            {phase === 4 && <PhaseTraguardo onRigioca={handleRigioca} />}
+            {phase === 4 && <PhaseTraguardo result={result} onRigioca={handleRigioca} />}
         </main>
     );
 };

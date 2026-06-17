@@ -5,17 +5,15 @@ import './App.css'
 import {Navbar} from "./components/Navbar.jsx";
 import {Login} from "./components/Login.jsx";
 import {Register} from "./components/Register.jsx"
-import API from "./api/api.js";
+import API from "./api/API.js";
 import {Game} from "./components/Game.jsx";
+import {UserDetails} from "./components/UserDetails.jsx"
+import {LeaderBoardSection} from "./components/LeaderBoard.jsx";
 
 
 export const UserContext = React.createContext(null)
 
 
-
-function UserDetails() {
-    return null;
-}
 
 
 
@@ -35,8 +33,9 @@ function App() {
               <Routes>
                     <Route path="/" element={<Game />} />
                     <Route path="/login" element={<Login />} />
-                    <Route path="/userDetails" element={<UserDetails />} />
+                    <Route path="/leaderBoard" element={<LeaderBoardSection />} />
                     <Route path="/register" element={<Register />} />
+                    <Route path="/userDetails" element={<UserDetails />} />
               </Routes>
           </BrowserRouter>
       </UserContext.Provider>

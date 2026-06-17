@@ -252,8 +252,8 @@ main .panel:last-child{
 /* wax seal play button */
 .btn-play-seal{
   position:relative;
-  width: 96px;
-  height: 96px;
+  width: 130px;
+  height: 130px;
   border-radius: 50%;
   border: 3px solid var(--brass-light);
   background: radial-gradient(circle at 35% 28%, #9c2b22 0%, #6e1812 55%, #420c0a 100%);
@@ -284,7 +284,6 @@ main .panel:last-child{
   letter-spacing: 1.5px;
   text-transform: uppercase;
   color: var(--parchment);
-  margin-top: 28px;
 }
 
 .btn-play-seal:hover{ transform: translateY(-2px); }
@@ -682,3 +681,110 @@ main .panel:last-child{
   text-decoration:none;
 }
 .form-actions a:hover{ color: var(--wine); }
+
+/* leaderboard */
+.leaderboard{
+  margin: 20px;
+}
+
+.leaderboard-title{
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--wine);
+  margin: 0 0 8px;
+}
+
+.lb-empty{
+  font-family: 'EB Garamond', serif;
+  font-size: 0.95rem;
+  color: var(--brass);
+  font-style: italic;
+  margin: 0;
+}
+
+.lb-scroll{
+  overflow-y: auto;
+  max-height: 55vh;
+}
+
+.lb-table{
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.lb-th{
+  font-family: 'Cinzel', serif;
+  font-size: 0.65rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--brass);
+  padding: 0 10px 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--brass);
+}
+.lb-th--rank{ width: 40px; text-align: center; }
+.lb-th--coins{ text-align: right; }
+
+.lb-row{
+  border-bottom: 1px solid rgba(169,118,47,0.25);
+  transition: background 0.15s;
+}
+.lb-row:hover{ background: rgba(169,118,47,0.08); }
+.lb-row--current{
+  background: rgba(122,34,24,0.07);
+}
+.lb-row--current .lb-td{
+  color: var(--wine);
+}
+
+.lb-td{
+  font-family: 'EB Garamond', serif;
+  font-size: 1rem;
+  color: var(--ink);
+  padding: 8px 10px;
+}
+.lb-td--rank{ text-align: center; }
+.lb-td--coins{
+  text-align: right;
+  font-family: 'Cinzel', serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.lb-rank{
+  font-family: 'Cinzel', serif;
+  font-size: 0.78rem;
+  color: var(--brass);
+}
+
+.lb-medal{
+  font-family: 'Cinzel', serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  line-height: 22px;
+  text-align: center;
+}
+.lb-medal--gold{ background: #c9962a; color: #fff4d6; }
+.lb-medal--silver{ background: #8f9094; color: #f0f0f0; }
+.lb-medal--bronze{ background: #7c4e2a; color: #f5dfc5; }
+
+.lb-you{
+  font-family: 'Cinzel', serif;
+  font-size: 0.65rem;
+  letter-spacing: 1px;
+  color: var(--wine);
+  opacity: 0.7;
+  margin-left: 4px;
+}
+
+.logged-warning{
+  text-align: center;
+
+}

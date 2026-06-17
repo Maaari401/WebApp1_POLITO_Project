@@ -25,13 +25,14 @@ function Event(id, title, text, bonus) {
     this.bonus = bonus;
 }
 
-function Game_Result(id, player_id, coin, id_station_start, id_station_end, started_at) {
+function Game_Result(id, player_id, coin, id_station_start, id_station_end, started_at, username) {
     this.id = id;
     this.player_id = player_id;
     this.coin = coin;
     this.id_station_start = id_station_start;
     this.id_station_end = id_station_end;
     this.started_at = started_at;
+    this.username = username;
 }
 
 function Ride(from, to) {
