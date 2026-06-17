@@ -67,130 +67,17 @@ const PhasePreparazione = ({ game, onReady }) => (
         </div>
     </section>
 );
-/*
-// phase 2 — pianificazione
-const PhasePianificazione = ({ game, onSubmit }) => {
-    const [routes, setRoutes] = useState([]);
-    const [stationMap, setStationMap] = useState([]);
-    
-    const [rides, setRides] = useState([]);
-    
-    
-    const [allRoutes, setAllRoutes] = useState(null);
-    const [selectedTo, setSelectedTo] = useState(null)
-    const [selectedFrom, setSelectedFrom] = useState(null)
-    
-    
-    
-    const [timeLeft, setTimeLeft] = useState(90);
-    
-    const submitted = timeLeft <= 0;
-
-    const currentFrom = rides.length > 0 ? rides[rides.length - 1].to : game.start;
-
-    useEffect(() => {
-        Promise.all([API.getRoutes(), API.getStations()])
-            .then(([rs, ss]) => {
-                setRoutes(rs);
-                const map = {};
-                ss.forEach(s => { map[s.id] = s.name; });
-                setStationMap(map);
-                const matrix = {};
-                for (const i of stationMap) {
-                    matrix[i] = {};
-                    for (const j of stationMap) {
-                        matrix[i][j] = false; // di default: nessun collegamento reale
-                    }
-                }
-                setAllRoutes(matrix);
-            })
-            .catch(console.error);
-    }, []);
-
-    useEffect(() => {
-        if (timeLeft <= 0) { onSubmit({ rides }); return; }
-        const t = setTimeout(() => setTimeLeft(prev => prev - 1), 1000);
-        return () => clearTimeout(t);
-    }, [timeLeft]);
-    
-    const addRide = () => {
-        setRides(prev => [...prev, { from: selectedFrom, to: selectedTo }]);
-        setSelectedTo("");
-    };
-    
-
-    const sn = (id) => stationMap[id] ?? id;
-    //TODO ADD DATA SELECT DINAMICALLY ---> GUARDA CLAUDE CHE NE SA.
-    return (
-        <section className="panel" aria-label="Pianificazione">
-            <div className="plan-header">
-                <h2 className="rules-header">Fase II: Pianificazione</h2>
-                <span className={`plan-timer ${timeLeft <= 10 ? "plan-timer--urgent" : ""}`}>{timeLeft}s</span>
-            </div>
-            <div className="rules-divider"><span></span></div>
-
-            <p className="plan-mission">
-                <span className="fase-title">Missione</span>
-                da <strong>{sn(game.start)}</strong> a <strong>{sn(game.end)}</strong>
-            </p>
-
-            <div className="plan-path">
-                {rides.length === 0
-                    ? <span className="plan-path-empty">Nessuna tratta selezionata</span>
-                    : rides.map((r, i) => (
-                        <span key={i} className="plan-ride">
-                            {sn(r.from)} → {sn(r.to)}
-                        </span>
-                    ))
-                }
-            </div>
-
-            {!submitted && (
-                <div className="plan-picker">
-                    <select
-                        className="plan-select"
-                        value={selectedTo}
-                        onChange={e => setSelectedTo(e.target.value)}
-                    >
-                        <option value="">Scegli partenza</option>
-                        {Object.entries(stationMap).map(([id, name]) => (
-                            <option key={id} value={id}>{name}</option>
-                        ))}
-                    </select>
-                    <span className="plan-arrow">→</span>
-                    <select
-                        className="plan-select"
-                        value={selectedFrom}
-                        onChange={e => setSelectedFrom(e.target.value)}
-                    >
-                        <option value="">Scegli destinazione</option>
-                        {Object.entries(stationMap).map(([id, name]) => {
-                            if (!allRoutes.get(selectedFrom)?.includes(id)) return null;
-                            return <option key={id} value={id}>{name}</option>;
-                        })}
-                    </select>
-                    <button className="plan-btn-add" onClick={addRide} disabled={!selectedTo}>+</button>
-                </div>)}
-
-            <div className="panel-footer">
-                <button className="btn-play-seal" onClick={() => onSubmit({ rides })} disabled={submitted}>
-                    <span>Conferma</span>
-                </button>
-            </div>
-        </section>
-    );
-};*/
 
 const PhasePianificazione = ({ game, onSubmit }) => {
-    const [stationMap, setStationMap] = useState({});
+    const [stationMap, setStationMap] = useState(new Map());
     const [rides, setRides] = useState([]);
     const [selectedFrom, setSelectedFrom] = useState("");
     const [selectedTo, setSelectedTo] = useState("");
+    const [editingIndex, setEditingIndex] = useState(null);
     const [timeLeft, setTimeLeft] = useState(90);
     
     const submitted = timeLeft <= 0;
     
-    // tratta direzionale: a->b è diversa da b->a
     const edgeKey = (a, b) => `${a}>${b}`;
     
     const usedEdges = useMemo(() => {
@@ -202,8 +89,8 @@ const PhasePianificazione = ({ game, onSubmit }) => {
     useEffect(() => {
         API.getStations()
             .then(ss => {
-                const map = {};
-                ss.forEach(s => { map[s.id] = s.name; });
+                const map = new Map();
+                ss.forEach(s => map.set(s.id, s.name));
                 setStationMap(map);
             })
             .catch(console.error);
@@ -216,16 +103,29 @@ const PhasePianificazione = ({ game, onSubmit }) => {
     }, [timeLeft]);
     
     const addRide = () => {
-        setRides(prev => [...prev, { from: selectedFrom, to: selectedTo }]);
+        const newRide = { from: Number(selectedFrom), to: Number(selectedTo) };
+        if (editingIndex !== null) {
+            setRides(prev => prev.map((r, i) => i === editingIndex ? newRide : r));
+            setEditingIndex(null);
+        } else {
+            setRides(prev => [...prev, newRide]);
+        }
         setSelectedFrom("");
         setSelectedTo("");
     };
-    
-    const sn = (id) => stationMap[id] ?? id;
-    
-    // unico vincolo: la tratta esatta (selectedFrom -> id) non deve
-    // essere già stata usata. Il percorso inverso resta sempre valido.
-    const availableDestinations = Object.entries(stationMap).filter(([id]) =>
+
+    const removeRide = (i) => setRides(prev => prev.filter((_, idx) => idx !== i));
+
+    const editRide = (i) => {
+        const r = rides[i];
+        setEditingIndex(i);
+        setSelectedFrom(r.from);
+        setSelectedTo(r.to);
+    };
+
+    const sn = (id) => stationMap.get(Number(id)) ?? id;
+
+    const availableDestinations = [...stationMap.entries()].filter(([id]) =>
         !usedEdges.has(edgeKey(selectedFrom, id))
     );
     
@@ -252,7 +152,13 @@ const PhasePianificazione = ({ game, onSubmit }) => {
                 {rides.length === 0
                     ? <span className="plan-path-empty">Nessuna tratta selezionata</span>
                     : rides.map((r, i) => (
-                        <span key={i} className="plan-ride">{sn(r.from)} → {sn(r.to)}</span>
+                        <span key={i} className="plan-ride">
+                            <span className="plan-ride-label">{sn(r.from)} → {sn(r.to)}</span>
+                            {!submitted && <>
+                                <button className="plan-ride-btn" onClick={() => editRide(i)} title="Modifica">✎</button>
+                                <button className="plan-ride-btn plan-ride-btn--delete" onClick={() => removeRide(i)} title="Elimina">×</button>
+                            </>}
+                        </span>
                     ))
                 }
             </div>
@@ -265,7 +171,7 @@ const PhasePianificazione = ({ game, onSubmit }) => {
                         onChange={e => { setSelectedFrom(e.target.value); setSelectedTo(""); }}
                     >
                         <option value="">Scegli partenza</option>
-                        {Object.entries(stationMap).map(([id, name]) => (
+                        {[...stationMap.entries()].map(([id, name]) => (
                             <option key={id} value={id}>{name}</option>
                         ))}
                     </select>
@@ -292,15 +198,103 @@ const PhasePianificazione = ({ game, onSubmit }) => {
         </section>
     );
 };
+// phase 3
+const PhaseViaggio = ({ result, onContinua, onRigioca }) => {
+    const [stationMap, setStationMap] = useState(new Map());
+    const [events, setEvents] = useState(null);
+    const [rideCount, setRideCount] = useState(1)
+    const [coin, setCoin] = useState(20)
+    
+    const isValid = result?.valid === true;
 
-// phase 3 — viaggio: stub
-const PhaseViaggio = () => (
-    <section className="panel" aria-label="Il viaggio">
-        <h2 className="rules-header">Il viaggio</h2>
-        <div className="rules-divider"><span></span></div>
-        {/* TODO: eventi tratta per tratta */}
-    </section>
-);
+    useEffect(() => {
+        API.getStations()
+            .then(ss => {
+                const map = new Map();
+                ss.forEach(s => map.set(s.id, s.name));
+                setStationMap(map);
+            })
+            .catch(console.error);
+    }, []);
+
+    useEffect(() => {
+        if (!isValid || !result.path?.length) return;
+        Promise.all(result.path.map(hop => API.getEvent(hop.event_id)))
+            .then(evs => {
+                setEvents(evs);
+                setCoin(20 + evs[0].bonus);
+            })
+            .catch(console.error);
+    }, [result]);
+
+    const handleNextHop = () => {
+        const newCount = rideCount + 1;
+        setRideCount(newCount);
+        setCoin(events.slice(0, newCount).reduce((acc, e) => acc + e.bonus, 20));
+    }
+    
+
+    const sn = (id) => stationMap.get(Number(id)) ?? `#${id}`;
+
+    return (
+        <section className="panel" aria-label="Il viaggio">
+            <h2 className="rules-header">Fase III: Il Viaggio</h2>
+            <span className={`plan-timer`}>{isValid && coin}</span>
+            <div className="rules-divider"><span></span></div>
+
+            {result?.error && (
+                <div className="viaggio-invalid">
+                    <span className="viaggio-invalid-title">Percorso non valido</span>
+                    <p className="viaggio-invalid-reason">hai perso tutte le monete.</p>
+                </div>
+            )}
+
+            {isValid && events && (
+                <>
+                    <div className="viaggio-list">
+                        {result.path.slice(0, rideCount).map((hop, i) => (
+                            <div key={i} className="viaggio-hop">
+                                <span className="viaggio-hop-num">{i + 1}</span>
+                                <div className="viaggio-hop-body">
+                                    <span className="viaggio-hop-route">{sn(hop.from)} → {sn(hop.to)}</span>
+                                    <span className="viaggio-event-title">{events[i].title}</span>
+                                    <span className="viaggio-event-text">{events[i].text}</span>
+                                </div>
+                                <span className={`viaggio-hop-bonus ${events[i].bonus >= 0 ? "viaggio-hop-bonus--pos" : "viaggio-hop-bonus--neg"}`}>
+                                    {events[i].bonus >= 0 ? "+" : ""}{events[i].bonus}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                    {rideCount < result.path.length && (
+                        <button className="btn-next-ride" onClick={handleNextHop}>
+                            <span>Prossima tratta</span>
+                            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5l8 7-8 7"/></svg>
+                        </button>
+                    )}
+                    {rideCount === result.path.length && (
+                        <div className="viaggio-summary">
+                        <span className="viaggio-summary-label">Monete finali</span>
+                        <span className="viaggio-summary-coins">{result.coin}</span>
+                    </div>)}
+                </>
+            )}
+            <div className="panel-footer">
+                {isValid && rideCount === result.path.length && (
+                    <button className="btn-play-seal" onClick={onContinua}>
+                        <span>Fine</span>
+                    </button>
+                )}
+                {!isValid && (
+                    <button className="btn-play-seal" onClick={onRigioca}>
+                        <span>Rigioca</span>
+                    </button>
+                )}
+                
+            </div>
+        </section>
+    );
+};
 
 // phase 4 — traguardo: stub
 const PhaseTraguardo = ({ onRigioca }) => (
@@ -325,6 +319,14 @@ export const Game = () => {
 
     const gameStarted = phase > 0;
 
+    useEffect(() => {
+        if (!user && phase > 0) {
+            setPhase(0);
+            setGame(null);
+            setResult(null);
+        }
+    }, [user, phase]);
+
     const handleGioca = () => {
         if (!user) { navigate("/login"); return; }
         setPhase(1)
@@ -340,9 +342,21 @@ export const Game = () => {
             console.error(err);
         }
     }
+    
+    const handleSubmitPianification = async (path) => {
+        try {
+            const res = await API.submitGame(game.game_id, path);
+            setResult(res);
+            setPhase(3);
+        } catch (err) {
+            console.error(err);
+            setPhase(3);
+        }
+    }
+    const handleRigioca = () => { setGame(null); setResult(null); setPhase(0); }
 
     // mappa con linee in fase 0-1, senza linee in fase 2+
-    const currentMap = phase >= 2 ? mapNoLines : mapImage;
+    const currentMap = phase === 2 ? mapNoLines : mapImage;
     const mapBlurred = !gameStarted && !user;
 
     return (
@@ -365,18 +379,9 @@ export const Game = () => {
 
             {phase === 0 && <PhaseRules onGioca={handleGioca} />}
             {phase === 1 && <PhasePreparazione onReady={() => handlePianification()} />}
-            {phase === 2 && <PhasePianificazione game={game} onSubmit={async (path) => {
-                try {
-                    const res = await API.submitGame(game.game_id, path);
-                    setResult(res);
-                    setPhase(3);
-                } catch (err) {
-                    console.error(err);
-                    setPhase(3);
-                }
-            }} />}
-            {phase === 3 && <PhaseViaggio />}
-            {phase === 4 && <PhaseTraguardo onRigioca={() => { setGame(null); setPhase(0); }} />}
+            {phase === 2 && <PhasePianificazione game={game} onSubmit={handleSubmitPianification} />}
+            {phase === 3 && <PhaseViaggio result={result} onContinua={() => setPhase(4)} onRigioca={handleRigioca}/>}
+            {phase === 4 && <PhaseTraguardo onRigioca={handleRigioca} />}
         </main>
     );
 };

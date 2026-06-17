@@ -113,7 +113,7 @@ const submitGame = async (game_id, path) => {
         body: JSON.stringify({ game_id, path }),
     });
     if (!res.ok) await handleError(res);
-    return res.json(); // { valid, coin, path }
+    return await res.json();
 };
 
 const API = {

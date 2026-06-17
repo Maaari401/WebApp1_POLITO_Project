@@ -57,7 +57,7 @@ export const createUser = (username, password, firstname, lastname, birth_date, 
 /* STATIONS */
 export const getStations = () => {
     return new Promise((resolve, reject) => {
-        const sql = "SELECT * FROM station";
+        const sql = "SELECT * FROM station ORDER BY name ASC";
         db.all(sql, (err, rows) => {
             if (err) {
                 reject(err);

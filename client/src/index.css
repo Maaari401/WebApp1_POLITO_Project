@@ -369,7 +369,24 @@ main .panel:last-child{
   border: 1px solid var(--brass);
   border-radius: 3px;
   padding: 5px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
+.plan-ride-label{ flex: 1; }
+.plan-ride-btn{
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--brass);
+  padding: 0 2px;
+  line-height: 1;
+  opacity: 0.7;
+  transition: opacity 0.15s, color 0.15s;
+}
+.plan-ride-btn:hover{ opacity: 1; }
+.plan-ride-btn--delete:hover{ color: var(--wine); }
 
 .plan-picker{
   display: flex;
@@ -421,6 +438,156 @@ main .panel:last-child{
 .plan-btn-add:disabled{ opacity: 0.4; cursor: default; }
 .plan-btn-add:not(:disabled):hover{ background: var(--wine-deep); }
 
+
+/* phase 3 — viaggio */
+.btn-next-ride{
+  align-self: flex-end;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: 0.78rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--parchment);
+  background: var(--wine);
+  border: 1px solid var(--brass);
+  border-radius: 3px;
+  padding: 10px 20px;
+  cursor: pointer;
+  margin-bottom: 12px;
+  transition: background 0.15s;
+}
+.btn-next-ride:hover{ background: var(--wine-deep); }
+.btn-next-ride svg{
+  width: 14px;
+  height: 14px;
+  stroke: var(--brass-light);
+  stroke-width: 2.5;
+  fill: none;
+}
+
+.viaggio-loading{
+  font-family: 'EB Garamond', serif;
+  color: var(--brass);
+  font-style: italic;
+}
+
+.viaggio-list{
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 44vh;
+  overflow-y: auto;
+  padding-right: 4px;
+  margin-bottom: 16px;
+}
+
+.viaggio-hop{
+  border: 1px solid var(--brass);
+  border-radius: 3px;
+  background: var(--parchment-dark);
+  padding: 10px 14px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.viaggio-hop-num{
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  color: var(--brass);
+  min-width: 18px;
+  padding-top: 2px;
+}
+
+.viaggio-hop-body{
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.viaggio-hop-route{
+  font-family: 'Cinzel', serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.5px;
+  color: var(--ink);
+}
+
+.viaggio-event-title{
+  font-family: 'Cinzel', serif;
+  font-size: 0.7rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--wine);
+}
+
+.viaggio-event-text{
+  font-family: 'EB Garamond', serif;
+  font-size: 0.95rem;
+  color: var(--ink);
+  line-height: 1.4;
+}
+
+.viaggio-hop-bonus{
+  font-family: 'Cinzel', serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  white-space: nowrap;
+  padding-top: 2px;
+}
+.viaggio-hop-bonus--pos{ color: #3a6e2a; }
+.viaggio-hop-bonus--neg{ color: var(--wine); }
+
+.viaggio-summary{
+  border-top: 1px solid var(--brass);
+  padding-top: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.viaggio-summary-label{
+  font-family: 'Cinzel', serif;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+
+.viaggio-summary-coins{
+  font-family: 'Cinzel', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--wine);
+}
+
+.viaggio-invalid{
+  border: 1px solid var(--wine);
+  border-radius: 3px;
+  background: rgba(122,34,24,0.06);
+  padding: 14px 18px;
+  margin-bottom: 16px;
+}
+
+.viaggio-invalid-title{
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--wine);
+  display: block;
+  margin-bottom: 6px;
+}
+
+.viaggio-invalid-reason{
+  font-family: 'EB Garamond', serif;
+  font-size: 1rem;
+  color: var(--ink);
+  margin: 0;
+}
 
 .login-container{
   display:flex;

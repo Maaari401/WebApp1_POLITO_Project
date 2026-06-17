@@ -243,12 +243,13 @@ app.post("/api/game/start", isLoggedIn, async (req, res) => {
         return res.status(503).json({ error: err.message });
     }
 });
+
 //POST /api/game/submit
 app.post("/api/game/submit", isLoggedIn, async (req, res) => {
     try {
         const validity = await getValidity(req.body.game_id, req.body.path, req.user.id);
         if (!validity.valid)
-            return res.status(500).json({ error: validity.reason });
+            return res.status(200).json({ valid: validity.valid, error: validity.reason});
         const { coin, ridesWithEvents } = await calculateGamePoints(req.body.game_id, req.body.path);
 
         res.status(200).json({
