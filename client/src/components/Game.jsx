@@ -1,9 +1,9 @@
-import {use, useContext, useEffect, useState} from "react";
+import {use, useContext, useEffect, useMemo, useState} from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../App.jsx";
 import API from "../api/api.js";
-import mapImage from "../../images/Gemini_Generated_Image_dzz864dzz864dzz8.png";
-import mapNoLines from "../../images/Gemini_Generated_Image_zfz1z7zfz1z7zfz1.png";
+import mapImage from "../../images/mappa.png";
+import mapNoLines from "../../images/mappaStazioni.png";
 
 // phase 0 — regole
 const PhaseRules = ({ onGioca }) => (
@@ -67,7 +67,7 @@ const PhasePreparazione = ({ game, onReady }) => (
         </div>
     </section>
 );
-
+/*
 // phase 2 — pianificazione
 const PhasePianificazione = ({ game, onSubmit }) => {
     const [routes, setRoutes] = useState([]);
@@ -120,7 +120,7 @@ const PhasePianificazione = ({ game, onSubmit }) => {
     
 
     const sn = (id) => stationMap[id] ?? id;
-    //TODO ADD DATA SELECT DINAMICALLY
+    //TODO ADD DATA SELECT DINAMICALLY ---> GUARDA CLAUDE CHE NE SA.
     return (
         <section className="panel" aria-label="Pianificazione">
             <div className="plan-header">
@@ -152,7 +152,7 @@ const PhasePianificazione = ({ game, onSubmit }) => {
                         value={selectedTo}
                         onChange={e => setSelectedTo(e.target.value)}
                     >
-                        <option value="">Scegli destinazione…</option>
+                        <option value="">Scegli partenza</option>
                         {Object.entries(stationMap).map(([id, name]) => (
                             <option key={id} value={id}>{name}</option>
                         ))}
@@ -163,14 +163,127 @@ const PhasePianificazione = ({ game, onSubmit }) => {
                         value={selectedFrom}
                         onChange={e => setSelectedFrom(e.target.value)}
                     >
-                        <option value="">Scegli destinazione…</option>
-                        {Object.entries(stationMap).map(([id, name]) => (
-                            <option key={id} value={id}>{name}</option>
-                        ))}
+                        <option value="">Scegli destinazione</option>
+                        {Object.entries(stationMap).map(([id, name]) => {
+                            if (!allRoutes.get(selectedFrom)?.includes(id)) return null;
+                            return <option key={id} value={id}>{name}</option>;
+                        })}
                     </select>
                     <button className="plan-btn-add" onClick={addRide} disabled={!selectedTo}>+</button>
                 </div>)}
 
+            <div className="panel-footer">
+                <button className="btn-play-seal" onClick={() => onSubmit({ rides })} disabled={submitted}>
+                    <span>Conferma</span>
+                </button>
+            </div>
+        </section>
+    );
+};*/
+
+const PhasePianificazione = ({ game, onSubmit }) => {
+    const [stationMap, setStationMap] = useState({});
+    const [rides, setRides] = useState([]);
+    const [selectedFrom, setSelectedFrom] = useState("");
+    const [selectedTo, setSelectedTo] = useState("");
+    const [timeLeft, setTimeLeft] = useState(90);
+    
+    const submitted = timeLeft <= 0;
+    
+    // tratta direzionale: a->b è diversa da b->a
+    const edgeKey = (a, b) => `${a}>${b}`;
+    
+    const usedEdges = useMemo(() => {
+        const set = new Set();
+        rides.forEach(r => set.add(edgeKey(r.from, r.to)));
+        return set;
+    }, [rides]);
+    
+    useEffect(() => {
+        API.getStations()
+            .then(ss => {
+                const map = {};
+                ss.forEach(s => { map[s.id] = s.name; });
+                setStationMap(map);
+            })
+            .catch(console.error);
+    }, []);
+    
+    useEffect(() => {
+        if (timeLeft <= 0) { onSubmit({ rides }); return; }
+        const t = setTimeout(() => setTimeLeft(prev => prev - 1), 1000);
+        return () => clearTimeout(t);
+    }, [timeLeft]);
+    
+    const addRide = () => {
+        setRides(prev => [...prev, { from: selectedFrom, to: selectedTo }]);
+        setSelectedFrom("");
+        setSelectedTo("");
+    };
+    
+    const sn = (id) => stationMap[id] ?? id;
+    
+    // unico vincolo: la tratta esatta (selectedFrom -> id) non deve
+    // essere già stata usata. Il percorso inverso resta sempre valido.
+    const availableDestinations = Object.entries(stationMap).filter(([id]) =>
+        !usedEdges.has(edgeKey(selectedFrom, id))
+    );
+    
+    return (
+        <section className="panel" aria-label="Pianificazione">
+            <div className="plan-header">
+                <h2 className="rules-header">Fase II: Pianificazione</h2>
+                <span className={`plan-timer ${timeLeft <= 10 ? "plan-timer--urgent" : timeLeft <= 30 ? "plan-timer--warning" : ""}`}>{timeLeft}s</span>
+            </div>
+            <div className="plan-progress">
+                <div
+                    className={`plan-progress-fill ${timeLeft <= 10 ? "plan-progress-fill--urgent" : timeLeft <= 30 ? "plan-progress-fill--warning" : ""}`}
+                    style={{ width: `${(timeLeft / 90) * 100}%` }}
+                />
+            </div>
+            <div className="rules-divider"><span></span></div>
+
+            <p className="plan-mission">
+                <span className="fase-title">Missione</span>
+                da <strong>{sn(game.start)}</strong> a <strong>{sn(game.end)}</strong>
+            </p>
+            
+            <div className="plan-path">
+                {rides.length === 0
+                    ? <span className="plan-path-empty">Nessuna tratta selezionata</span>
+                    : rides.map((r, i) => (
+                        <span key={i} className="plan-ride">{sn(r.from)} → {sn(r.to)}</span>
+                    ))
+                }
+            </div>
+            
+            {!submitted && (
+                <div className="plan-picker">
+                    <select
+                        className="plan-select"
+                        value={selectedFrom}
+                        onChange={e => { setSelectedFrom(e.target.value); setSelectedTo(""); }}
+                    >
+                        <option value="">Scegli partenza</option>
+                        {Object.entries(stationMap).map(([id, name]) => (
+                            <option key={id} value={id}>{name}</option>
+                        ))}
+                    </select>
+                    <span className="plan-arrow">→</span>
+                    <select
+                        className="plan-select"
+                        value={selectedTo}
+                        onChange={e => setSelectedTo(e.target.value)}
+                        disabled={!selectedFrom}
+                    >
+                        <option value="">Scegli destinazione</option>
+                        {availableDestinations.map(([id, name]) => (
+                            <option key={id} value={id}>{name}</option>
+                        ))}
+                    </select>
+                    <button className="plan-btn-add" onClick={addRide} disabled={!selectedFrom || !selectedTo}>+</button>
+                </div>)}
+            
             <div className="panel-footer">
                 <button className="btn-play-seal" onClick={() => onSubmit({ rides })} disabled={submitted}>
                     <span>Conferma</span>
