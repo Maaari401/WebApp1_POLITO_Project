@@ -1,10 +1,12 @@
 import API from "../api/API.js";
 import { useContext, useEffect, useState } from "react";
-import { UserContext } from "../App.jsx";
+import { UserContext } from "../UserContext.js";
 import mapImage from "../../images/mappa.png";
+import {GameMap} from "./Map.jsx";
+import {Navigate} from "react-router-dom";
 
 
-export const LeaderBoard = () => {
+export const LeaderBoard = ({small}) => {
     const { user } = useContext(UserContext);
     const [scores, setScores] = useState([]);
     const [stationMap, setStationMap] = useState(new Map());
@@ -44,7 +46,7 @@ export const LeaderBoard = () => {
             {scores.length === 0 ? (
                 <p className="lb-empty">Nessuna partita registrata.</p>
             ) : (
-                <div className="lb-scroll">
+                <div className="lb-scroll" style={small ? { maxHeight: "45vh" } : undefined}>
                     <table className="lb-table">
                         <thead>
                             <tr>
@@ -84,24 +86,15 @@ export const LeaderBoard = () => {
 
 export const LeaderBoardSection = () => {
     const { user } = useContext(UserContext);
+    if (!user) return <Navigate to="/" />; //can't use navigate bc it cannot be call during the render of the component.
 
-    return user !== null ? (
+    return (
         <main>
-            <section className="panel" aria-label="Mappa di gioco">
-                <span className="panel-label">Mappa &middot; linee e stazioni</span>
-                <div className="map-frame" style={{ position: "relative" }}>
-                    <img
-                        src={mapImage}
-                        alt="Mappa della Rete Metropolitana di Valdoria"
-                    />
-                </div>
-            </section>
+            <GameMap phase={null} />
             <section className="panel" aria-label="Regole">
-                <LeaderBoard/>
+                <LeaderBoard small={false}/>
             </section>
         </main>
         
-    ):(
-        <h2 className="logged-warning">Devi essere loggato per vedere questa sezione</h2>
-    );
+    )
 }

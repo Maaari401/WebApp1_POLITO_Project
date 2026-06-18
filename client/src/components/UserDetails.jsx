@@ -1,8 +1,9 @@
 import { useContext, useEffect, useState } from "react";
 import dayjs from "dayjs";
-import { UserContext } from "../App.jsx";
+import { UserContext } from "../UserContext.js";
 import mapImage from "../../images/mappa.png";
 import API from "../api/API.js";
+import {Navigate} from "react-router-dom";
 
 const GameHistory = ({ player_id }) => {
     const [games, setGames] = useState([]);
@@ -53,7 +54,7 @@ const GameHistory = ({ player_id }) => {
                                     <td className="lb-td">{fmt(g.started_at)}</td>
                                     <td className="lb-td">{sn(g.id_station_start)}</td>
                                     <td className="lb-td">{sn(g.id_station_end)}</td>
-                                    <td className="lb-td lb-td--coins">{g.coin}</td>
+                                    <td className="lb-td lb-td--coins">{g.coin >= 0 ? g.coin : "Non Valido"}</td>
                                 </tr>
                             ))}
                         </tbody>
@@ -68,7 +69,9 @@ const GameHistory = ({ player_id }) => {
 export const UserDetails = () => {
     const { user } = useContext(UserContext);
 
-    return user !== null && (
+    if (!user) return <Navigate to="/" />; //can't use navigate bc it cannot be call during the render of the component.
+
+    return (
         <main>
             <section className="panel" aria-label="Mappa di gioco">
                 <span className="panel-label">Mappa &middot; linee e stazioni</span>

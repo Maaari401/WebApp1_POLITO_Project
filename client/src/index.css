@@ -707,7 +707,7 @@ main .panel:last-child{
 
 .lb-scroll{
   overflow-y: auto;
-  max-height: 55vh;
+  max-height: 65vh;
 }
 
 .lb-table{
@@ -786,5 +786,37 @@ main .panel:last-child{
 
 .logged-warning{
   text-align: center;
-
 }
+
+.game-error{
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--parchment);
+  border: 1px solid var(--wine);
+  border-radius: 3px;
+  padding: 12px 20px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  z-index: 100;
+}
+
+.game-error-text{
+  font-family: 'EB Garamond', serif;
+  font-size: 1rem;
+  color: var(--wine);
+}
+
+.game-error-dismiss{
+  background: none;
+  border: none;
+  font-size: 1.3rem;
+  color: var(--brass);
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+}
+.game-error-dismiss:hover{ color: var(--wine); }

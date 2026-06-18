@@ -1,4 +1,4 @@
-import React, {createContext, useState} from 'react'
+import {useState} from 'react'
 import { BrowserRouter, Route, Routes} from "react-router-dom";
 import './App.css'
 
@@ -9,11 +9,7 @@ import API from "./api/API.js";
 import {Game} from "./components/Game.jsx";
 import {UserDetails} from "./components/UserDetails.jsx"
 import {LeaderBoardSection} from "./components/LeaderBoard.jsx";
-
-
-export const UserContext = React.createContext(null)
-
-
+import {UserContext} from "./UserContext.js"
 
 
 
@@ -31,7 +27,7 @@ function App() {
           <BrowserRouter>
               <Navbar/>
               <Routes>
-                    <Route path="/" element={<Game />} />
+                    <Route path="/" element={<Game key={user ? user.id : "guest"} />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/leaderBoard" element={<LeaderBoardSection />} />
                     <Route path="/register" element={<Register />} />

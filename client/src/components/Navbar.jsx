@@ -1,4 +1,4 @@
-import {UserContext} from "../App.jsx";
+import {UserContext} from "../UserContext.js";
 import {useContext} from "react";
 import {useNavigate} from "react-router-dom";
 
@@ -28,7 +28,7 @@ export const Navbar = () => {
                 }
                 
                 <div className="avatar" onClick={() => navigate('/UserDetails')}>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                         <circle cx="12" cy="8" r="3.2"/>
                         <path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6"/>
                     </svg>

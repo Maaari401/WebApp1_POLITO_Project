@@ -137,9 +137,7 @@ app.get("/api/station/:id", isLoggedIn, [check("id").isInt().withMessage("The id
 
 //GET /api/stations
 app.get("/api/stations", isLoggedIn, async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty())
-        return res.status(422).json({ errors: errors.array() });
+    
     try {
         const stations = await getStations()
         return res.status(200).json(stations);

@@ -78,12 +78,3 @@ content-type: application/json
   }
 }
 
-
-
-
-
-### SubmitGame (14 -> 7)
-POST localhost:3001/api/game/submit
-content-type: application/json
-
-{"game_id":62,"path":{"rides":[{"from":5,"to":12},{"from":12,"to":9},{"from":9,"to":8},{"from": 8,"to": 7}]}}
