@@ -44,10 +44,10 @@ export const createUser = (username, password, firstname, lastname, birth_date, 
         crypto.scrypt(password, salt, 64, (err, hashedPassword) => {
             if (err) reject(err);
 
-            const sql = "INSERT INTO user (username, password, firstaname, lastname, birth_date, email, salt) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            const sql = "INSERT INTO user (username, password, firstname, lastname, birth_date, email, salt) VALUES (?, ?, ?, ?, ?, ?, ?)";
             db.run(sql, [username, hashedPassword.toString("hex"), firstname, lastname, birth_date, email, salt], function (err) {
                 if (err) reject(err);
-                else resolve( new User(this.id, username, password, firstname, lastname, birth_date, email, salt));
+                else resolve( new User(this.lastID, username, email, firstname, lastname, birth_date));
             });
         });
     });
@@ -280,7 +280,7 @@ export const getGameRides = (game_id) => {
                 ride_order: r.ride_order,
                 from: r.from_station,
                 to: r.to_station,
-                event_id: new Event(r.event_id, r.title, r.text, r.bonus),
+                event_id: r.event_id,
             })));
         });
     });

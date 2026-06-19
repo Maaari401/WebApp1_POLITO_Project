@@ -6,7 +6,7 @@
 
 - Route `/`: home page e game page, dove effettivamente risiede il gioco con anche le sue regole
 - Route `/login`: pagina di login
-- Route `/registration`: pagina di registrazione
+- Route `/register`: pagina di registrazione
 - Route `/leaderBoard`: pagina con la classifica globale degli utenti.
 - Route `/userDetails`: pagina con la cronoistoria delle partite effettuate dall'utente loggato.
 ## API Server
