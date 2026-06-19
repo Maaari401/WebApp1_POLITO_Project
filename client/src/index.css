@@ -339,16 +339,14 @@ main .panel:last-child{
   font-family: 'EB Garamond', serif;
   font-size: 1.05rem;
   margin: 0 0 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
 }
 
 .plan-path{
   display: flex;
   flex-direction: column;
   gap: 6px;
-  min-height: 60px;
+  height: 160px;
+  overflow-y: auto;
   margin-bottom: 20px;
 }
 
@@ -387,55 +385,43 @@ main .panel:last-child{
 .plan-ride-btn:hover{ opacity: 1; }
 .plan-ride-btn--delete:hover{ color: var(--wine); }
 
-.plan-picker{
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
-.plan-from{
+.plan-section-label{
   font-family: 'Cinzel', serif;
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--wine);
-  white-space: nowrap;
-}
-
-.plan-arrow{
+  font-size: 0.7rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
   color: var(--brass);
-  font-size: 1rem;
+  margin-bottom: 4px;
 }
 
-.plan-select{
-  flex: 1;
+.plan-routes-list{
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 250px;
+  overflow-y: auto;
+  margin-bottom: 16px;
+  border: 1px solid var(--brass);
+  border-radius: 3px;
+  padding: 6px;
+  background: var(--parchment-dark);
+  overflow-y: auto;
+}
+
+.plan-route-item{
   font-family: 'EB Garamond', serif;
   font-size: 0.95rem;
-  padding: 7px 10px;
-  background: var(--parchment-dark);
-  border: 1px solid var(--brass);
-  border-radius: 3px;
   color: var(--ink);
-}
-.plan-select:focus{ outline: none; border-color: var(--wine); }
-
-.plan-btn-add{
-  font-family: 'Cinzel', serif;
-  font-weight: 700;
-  font-size: 1.1rem;
-  width: 34px;
-  height: 34px;
-  background: var(--wine);
-  color: var(--parchment);
-  border: 1px solid var(--brass);
-  border-radius: 3px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid rgba(169,118,47,0.2);
+  padding: 5px 6px;
+  text-align: left;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  transition: background 0.12s, color 0.12s;
 }
-.plan-btn-add:disabled{ opacity: 0.4; cursor: default; }
-.plan-btn-add:not(:disabled):hover{ background: var(--wine-deep); }
+.plan-route-item:last-child{ border-bottom: none; }
+.plan-route-item:hover{ background: var(--parchment); color: var(--wine); }
 
 
 /* phase 3 — viaggio */
