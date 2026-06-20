@@ -119,12 +119,12 @@
 
 ## Database Tables
 
-- Table `user` - contains id (PK), username, password, email, firstname, lastname, birth_date, salt (usato per la cifratura)
-- Table `station` - contains id (PK), name
-- Table `route` - contains id (PK), id_station_start (id stazione di partenza della tratta), id_station_end (id stazione di arrivo della tratta)
-- Table `event` - contains id (PK), title, text (descrizione dell'evento), bonus (valore attribuito all'evento `[-4;+4]`)
-- Table `game_result` - contains id (PK), player_id (id dell'utente), coin (risultato della partita), id_station_start (id stazione di partenza della partita), id_station_end (id stazione di arrivo della partita), started_at (data al secondo dell'inizio della partita)
-- Table `game_ride` - contains id (PK), game_result_id (id della partita), from_station (id stazione della tratta partenza), to_station (id stazione della tratta destinazione), event_id (id evento accaduto durante la tratta), ride_order (ordine della tratta)
+- Table `user` - contiene le credenziali e i dati anagrafici degli utenti registrati. Scopo: autenticazione (Passport.js) e identificazione del giocatore nella classifica. Campi: id (PK), username, password (hash scrypt), email, firstname, lastname, birth_date, salt (usato per la cifratura).
+- Table `station` - contiene le stazioni della rete metropolitana permettendo di definire nodi del grafo su cui si svolge il gioco. Campi: id (PK), name.
+- Table `route` - contiene i collegamenti diretti tra coppie di stazioni defininendo gli archi direzionali del grafo della rete. Campi: id (PK), id_station_start, id_station_end.
+- Table `event` - contiene gli eventi casuali che possono verificarsi durante una tratta. Campi: id (PK), title, text (descrizione), bonus (intero in `[-4;+4]`).
+- Table `game_result` - contiene il risultato complessivo e l'orario di ogni partita giocata. Campi: id (PK), player_id (FK → user), coin, id_station_start, id_station_end, started_at.
+- Table `game_ride` - contiene le singole tratte percorse in ogni partita, con l'evento occorso permette di tracciare il dettaglio tappa-per-tappa di una partita. Campi: id (PK), game_result_id (FK → game_result), from_station, to_station, event_id (FK → event), ride_order.
 
 NOTA:
 - la tabella `route` contiene i collegamenti reali tra le stazioni, non le possibili partite predisposte (vengono calcolate da una funzione per ogni partita)
@@ -150,7 +150,8 @@ NOTA:
 
 ## Screenshot
 
-![Screenshot](./img/screenshot.jpg)
+![Screenshot](screenshots/leaderBoard.png)
+![Screenshot](screenshots/Game.png)
 
 ## Users Credentials
 
@@ -161,6 +162,6 @@ NOTA:
 ## Use of AI Tools
 Per questo progetto sono state utilizzate 2 AI.
 - Claude.ai: Utilizzato per `spiegare alcuni concetti` i quali non mi erano chiari come il Route e Context; `debuggin` e anche `refractoring` del codice per uniformalo e renderlo facile da mantenere.
-- Gemini: per la creazione delle immagini (SVG e PNG).
+- Gemini: per la creazione delle immagini (SVG e PNG) e la creazione degli eventi.
 
-Il codide modificato dal qualsiasi agente è stato accuratamente **analizzato** e **studiato** in ogni sua parte prima di essere riportato all'interno del progetto.
+Il codide modificato dal qualsiasi agente è stato accuratamente **analizzato** e **studiato** in ogni sua parte prima di essere riportato (ed adattato) all'interno del progetto.
