@@ -54,7 +54,13 @@ const GameHistory = ({ player_id }) => {
                                     <td className="lb-td">{fmt(g.started_at)}</td>
                                     <td className="lb-td">{sn(g.id_station_start)}</td>
                                     <td className="lb-td">{sn(g.id_station_end)}</td>
-                                    <td className="lb-td lb-td--coins">{g.coin >= 0 ? g.coin : "Non Valido"}</td>
+                                    <td className="lb-td lb-td--coins">
+                                        {g.coin == null
+                                            ? "Non consegnato"
+                                            : g.coin >= 0
+                                                ? g.coin
+                                                : "Non Valido"}
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>

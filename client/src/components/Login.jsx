@@ -16,7 +16,7 @@ export const Login = () => {
         try {
             const user = await API.login(username, password);
             login(user);
-            navigate("/userDetails");
+            navigate("/");
         } catch (err) {
             setError(err.message);
         }
